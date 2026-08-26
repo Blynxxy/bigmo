@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Grieve Ancestry</title>
+    <meta name="description" content="The Grieve Ancestry and family history featuring connections to Blyth, Northumberland.">
     <style>
         body {
             background-color: #000000;
@@ -42,6 +43,7 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
             transition: transform 0.3s ease;
             background-color: #111111;
+            cursor: pointer;
         }
 
         .gallery-item:hover {
@@ -55,16 +57,19 @@
             object-fit: cover;
         }
 
-        .history-section {
+        .history-section, .trivia-section {
             max-width: 800px;
+            width: 100%;
             background-color: #111111;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
             line-height: 1.6;
+            margin-bottom: 30px;
+            box-sizing: border-box;
         }
 
-        .history-section h2 {
+        .history-section h2, .trivia-section h2 {
             margin-top: 0;
             color: #ffffff;
             font-size: 1.8rem;
@@ -72,9 +77,31 @@
             padding-bottom: 10px;
         }
 
-        .history-section p {
+        .history-section p, .trivia-section p {
             color: #cccccc;
             margin-bottom: 15px;
+        }
+
+        /* Fullscreen Lightbox Modal Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -82,18 +109,20 @@
 
     <h1>The Grieve Ancestry</h1>
 
+    <!-- Photo Gallery -->
     <div class="photo-gallery">
-        <div class="gallery-item">
+        <div class="gallery-item" onclick="openLightbox('cake.png')">
             <img src="cake.png" alt="Birthday Cake">
         </div>
-        <div class="gallery-item">
+        <div class="gallery-item" onclick="openLightbox('gorilla.png')">
             <img src="gorilla.png" alt="Safari Park Gorilla Statue">
         </div>
-        <div class="gallery-item">
+        <div class="gallery-item" onclick="openLightbox('swings.png')">
             <img src="swings.png" alt="Swings at Night">
         </div>
     </div>
 
+    <!-- Family History Section -->
     <div class="history-section">
         <h2>The Grieve Family of Blyth</h2>
         <p>The Grieve family has connections to Blyth, Northumberland, and forms part of a wider family story rooted in the local community. Liam Grieve is part of this family, with his mother, Emma, and his father, Adam Crozier.</p>
@@ -101,6 +130,38 @@
         <p>To build a reliable ancestry history, the family tree could be traced backwards from Liam through Emma and Adam, recording each generation's names, dates, occupations, marriages, and places of residence. Particular attention could be given to Blyth and surrounding Northumberland communities, where historical records may reveal connections between different branches of the family.</p>
         <p><em>This account should be treated as a starting point rather than a verified genealogy. Specific ancestry claims should be supported by documentary records before being presented as established family history.</em></p>
     </div>
+
+    <!-- Trivia Section -->
+    <div class="trivia-section">
+        <h2>Test Your Knowledge: Grieve Family Trivia</h2>
+        <p><strong>1. Which Northumberland town is central to the Grieve family history?</strong><br>
+        <em>Answer: Blyth</em></p>
+        
+        <p><strong>2. Who are Liam Grieve's parents mentioned in the family story?</strong><br>
+        <em>Answer: Emma and Adam Crozier</em></p>
+        
+        <p><strong>3. Name types of documents suggested for building a reliable ancestry history.</strong><br>
+        <em>Answer: Birth/marriage certificates, census returns, electoral registers, parish records, and local archives.</em></p>
+    </div>
+
+    <!-- Fullscreen Lightbox Container -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Fullscreen View">
+    </div>
+
+    <script>
+        function openLightbox(imageSrc) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = imageSrc;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.display = 'none';
+        }
+    </script>
 
 </body>
 </html>
