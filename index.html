@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Gallery</title>
+    <style>
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .gallery-item {
+            flex: 1 1 280px;
+            max-width: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="photo-gallery">
+        <div class="gallery-item">
+            <img src="cake.png" alt="Birthday Cake">
+        </div>
+        <div class="gallery-item">
+            <img src="gorilla.png" alt="Safari Park Gorilla Statue">
+        </div>
+        <div class="gallery-item">
+            <img src="swings.png" alt="Swings at Night">
+        </div>
+    </div>
+
+</body>
+</html>
