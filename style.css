@@ -1,0 +1,195 @@
+/* =========================================================
+   MUSIC PLAYER
+========================================================= */
+
+.music-player {
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    z-index: 80;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 15px 8px 8px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(5, 8, 13, .72);
+
+    border:
+        1px solid rgba(0,234,255,.2);
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.45),
+        0 0 25px rgba(0,234,255,.06);
+
+    transition:
+        .4s cubic-bezier(.16,1,.3,1);
+}
+
+.music-player:hover {
+    border-color:
+        rgba(0,234,255,.55);
+
+    box-shadow:
+        0 10px 50px rgba(0,0,0,.6),
+        0 0 35px rgba(0,234,255,.15);
+
+    transform: translateY(-3px);
+}
+
+#musicButton {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0,234,255,.35);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.16),
+            rgba(0,234,255,.03)
+        );
+
+    color: var(--cyan);
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    box-shadow:
+        0 0 15px rgba(0,234,255,.12);
+
+    transition: .3s;
+}
+
+#musicButton:hover {
+    box-shadow:
+        0 0 15px rgba(0,234,255,.35),
+        0 0 40px rgba(0,234,255,.12);
+
+    transform: scale(1.06);
+}
+
+.music-icon {
+    font-size: 20px;
+
+    line-height: 1;
+
+    position: relative;
+    z-index: 2;
+}
+
+.music-bars {
+    display: none;
+
+    align-items: center;
+    gap: 2px;
+
+    height: 20px;
+}
+
+.music-bars i {
+    display: block;
+
+    width: 3px;
+    height: 8px;
+
+    border-radius: 5px;
+
+    background: var(--cyan);
+
+    box-shadow:
+        0 0 8px var(--cyan);
+
+    animation:
+        musicBar .7s ease-in-out infinite alternate;
+}
+
+.music-bars i:nth-child(1) {
+    animation-delay: -.3s;
+}
+
+.music-bars i:nth-child(2) {
+    animation-delay: -.1s;
+}
+
+.music-bars i:nth-child(3) {
+    animation-delay: -.5s;
+}
+
+.music-bars i:nth-child(4) {
+    animation-delay: -.2s;
+}
+
+.music-player.playing .music-icon {
+    display: none;
+}
+
+.music-player.playing .music-bars {
+    display: flex;
+}
+
+.music-info {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 110px;
+}
+
+.music-status {
+    color: var(--cyan);
+
+    font-size: .55rem;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 3px;
+}
+
+.music-info strong {
+    color: white;
+
+    font-size: .72rem;
+
+    font-weight: 500;
+}
+
+@keyframes musicBar {
+
+    from {
+        height: 5px;
+    }
+
+    to {
+        height: 18px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .music-player {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .music-info {
+        display: none;
+    }
+
+}
