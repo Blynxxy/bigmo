@@ -1,167 +1,2889 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Grieve Ancestry</title>
-    <meta name="description" content="The Grieve Ancestry and family history featuring connections to Blyth, Northumberland.">
-    <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-            letter-spacing: 1px;
-        }
+<title>The Grieve Ancestry</title>
 
-        .photo-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 40px;
-        }
+<meta name="description"
+      content="The Grieve Ancestry and family history featuring connections to Blyth, Northumberland.">
 
-        .gallery-item {
-            flex: 1 1 300px;
-            max-width: 350px;
-            height: 450px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-            background-color: #111111;
-            cursor: pointer;
-        }
+<style>
 
-        .gallery-item:hover {
-            transform: translateY(-5px);
-        }
+/* =========================================================
+   VARIABLES
+========================================================= */
 
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: cover;
-        }
+:root {
+    --bg: #030406;
+    --panel: rgba(15, 18, 24, 0.72);
+    --panel-border: rgba(255,255,255,0.1);
 
-        .history-section, .trivia-section {
-            max-width: 800px;
-            width: 100%;
-            background-color: #111111;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
-            line-height: 1.6;
-            margin-bottom: 30px;
-            box-sizing: border-box;
-        }
+    --text: #f5f7ff;
+    --muted: #a7adbd;
 
-        .history-section h2, .trivia-section h2 {
-            margin-top: 0;
-            color: #ffffff;
-            font-size: 1.8rem;
-            border-bottom: 1px solid #333333;
-            padding-bottom: 10px;
-        }
+    --cyan: #00eaff;
+    --blue: #5577ff;
+    --purple: #a855f7;
 
-        .history-section p, .trivia-section p {
-            color: #cccccc;
-            margin-bottom: 15px;
-        }
+    --glow:
+        0 0 10px rgba(0,234,255,.45),
+        0 0 35px rgba(85,119,255,.2);
 
-        /* Fullscreen Lightbox Modal Styles */
-        #lightbox {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
+    --ease: cubic-bezier(.16,1,.3,1);
+}
 
-        #lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 8px;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-        }
-    </style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 20% 10%,
+            rgba(0,234,255,.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(168,85,247,.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(85,119,255,.08),
+            transparent 35%
+        ),
+
+        var(--bg);
+
+    color: var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   VFX CANVAS
+========================================================= */
+
+#vfxCanvas {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+/* =========================================================
+   CURSOR GLOW
+========================================================= */
+
+#cursorGlow {
+    position: fixed;
+
+    width: 320px;
+    height: 320px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.09),
+            rgba(85,119,255,.035) 35%,
+            transparent 70%
+        );
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+
+    z-index: 1;
+
+    mix-blend-mode: screen;
+
+    transition:
+        left .15s ease-out,
+        top .15s ease-out;
+}
+
+
+/* =========================================================
+   SCANLINES
+========================================================= */
+
+body::before {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 20;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,.018) 0px,
+            rgba(255,255,255,.018) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    opacity: .22;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.nav {
+    position: fixed;
+
+    top: 18px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(900px, calc(100% - 30px));
+
+    padding:
+        12px 18px;
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    border:
+        1px solid var(--panel-border);
+
+    background:
+        rgba(5,7,11,.65);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    border-radius:
+        999px;
+
+    z-index:
+        50;
+
+    box-shadow:
+        0 10px 50px rgba(0,0,0,.35),
+        inset 0 1px rgba(255,255,255,.06);
+}
+
+.logo {
+    font-weight:
+        800;
+
+    letter-spacing:
+        2px;
+
+    font-size:
+        .8rem;
+}
+
+.logo span {
+    color:
+        var(--cyan);
+
+    text-shadow:
+        var(--glow);
+}
+
+.nav-links {
+    display:
+        flex;
+
+    gap:
+        20px;
+}
+
+.nav-links a {
+    color:
+        #aeb5c8;
+
+    text-decoration:
+        none;
+
+    font-size:
+        .8rem;
+
+    transition:
+        .25s;
+}
+
+.nav-links a:hover {
+    color:
+        white;
+
+    text-shadow:
+        0 0 12px var(--cyan);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+    position:
+        relative;
+
+    z-index:
+        2;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    min-height:
+        100vh;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    text-align:
+        center;
+
+    padding:
+        120px 20px 80px;
+}
+
+.eyebrow {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        7px 13px;
+
+    border:
+        1px solid rgba(0,234,255,.25);
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(0,234,255,.04);
+
+    color:
+        #8beefa;
+
+    font-size:
+        .72rem;
+
+    letter-spacing:
+        2px;
+
+    text-transform:
+        uppercase;
+
+    animation:
+        fadeUp 1s var(--ease) both;
+}
+
+.status-dot {
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 8px var(--cyan),
+        0 0 20px var(--cyan);
+
+    animation:
+        pulse 1.5s infinite;
+}
+
+.hero h1 {
+    position:
+        relative;
+
+    margin:
+        25px 0 15px;
+
+    font-size:
+        clamp(3rem, 9vw, 8rem);
+
+    line-height:
+        .9;
+
+    letter-spacing:
+        -5px;
+
+    font-weight:
+        900;
+
+    background:
+        linear-gradient(
+            120deg,
+            #ffffff 20%,
+            #8cefff 45%,
+            #768cff 70%,
+            #d08cff
+        );
+
+    -webkit-background-clip:
+        text;
+
+    background-clip:
+        text;
+
+    color:
+        transparent;
+
+    text-shadow:
+        0 0 40px rgba(0,234,255,.08);
+
+    animation:
+        heroReveal 1.2s var(--ease) both;
+}
+
+.hero h1::after {
+    content:
+        attr(data-text);
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        -1;
+
+    color:
+        transparent;
+
+    text-shadow:
+        0 0 40px rgba(0,234,255,.3),
+        0 0 100px rgba(85,119,255,.2);
+}
+
+.hero-subtitle {
+    max-width:
+        680px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        clamp(1rem, 2vw, 1.2rem);
+
+    line-height:
+        1.7;
+
+    animation:
+        fadeUp 1s .25s var(--ease) both;
+}
+
+.hero-line {
+    width:
+        min(500px, 80%);
+
+    height:
+        1px;
+
+    margin:
+        35px auto;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--cyan),
+            var(--purple),
+            transparent
+        );
+
+    box-shadow:
+        0 0 15px rgba(0,234,255,.5);
+
+    animation:
+        lineGrow 1.5s .4s var(--ease) both;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+section {
+    width:
+        min(1100px, calc(100% - 30px));
+
+    margin:
+        0 auto 100px;
+}
+
+.section-label {
+    color:
+        var(--cyan);
+
+    font-size:
+        .7rem;
+
+    letter-spacing:
+        3px;
+
+    text-transform:
+        uppercase;
+
+    margin-bottom:
+        10px;
+}
+
+.section-title {
+    font-size:
+        clamp(2rem, 5vw, 3.5rem);
+
+    margin:
+        0 0 35px;
+
+    letter-spacing:
+        -2px;
+}
+
+
+/* =========================================================
+   PHOTO GALLERY
+========================================================= */
+
+.photo-gallery {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(280px, 1fr)
+        );
+
+    gap:
+        22px;
+}
+
+.gallery-item {
+    position:
+        relative;
+
+    height:
+        470px;
+
+    overflow:
+        hidden;
+
+    border-radius:
+        20px;
+
+    background:
+        #0b0e14;
+
+    border:
+        1px solid rgba(255,255,255,.09);
+
+    cursor:
+        pointer;
+
+    transform-style:
+        preserve-3d;
+
+    transition:
+        transform .5s var(--ease),
+        border-color .4s,
+        box-shadow .4s;
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.45);
+}
+
+.gallery-item::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        2;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.12),
+            transparent 30%,
+            transparent 70%,
+            rgba(0,234,255,.08)
+        );
+
+    pointer-events:
+        none;
+}
+
+.gallery-item::after {
+    content:
+        "VIEW MEMORY";
+
+    position:
+        absolute;
+
+    bottom:
+        20px;
+
+    left:
+        20px;
+
+    padding:
+        8px 12px;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(0,0,0,.55);
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    backdrop-filter:
+        blur(10px);
+
+    color:
+        white;
+
+    font-size:
+        .65rem;
+
+    letter-spacing:
+        2px;
+
+    opacity:
+        0;
+
+    transform:
+        translateY(10px);
+
+    transition:
+        .35s;
+
+    z-index:
+        5;
+}
+
+.gallery-item:hover {
+    border-color:
+        rgba(0,234,255,.5);
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.7),
+        0 0 35px rgba(0,234,255,.12);
+}
+
+.gallery-item:hover::after {
+    opacity:
+        1;
+
+    transform:
+        translateY(0);
+}
+
+.gallery-item img {
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+    transition:
+        transform .8s var(--ease),
+        filter .5s;
+}
+
+.gallery-item:hover img {
+    transform:
+        scale(1.08);
+
+    filter:
+        brightness(1.08)
+        saturate(1.2);
+}
+
+
+/* =========================================================
+   GLASS CARDS
+========================================================= */
+
+.content-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(280px, .6fr);
+
+    gap:
+        25px;
+}
+
+.glass-card {
+    position:
+        relative;
+
+    padding:
+        35px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.015)
+        );
+
+    border:
+        1px solid var(--panel-border);
+
+    border-radius:
+        22px;
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    overflow:
+        hidden;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.35);
+
+    transition:
+        transform .5s var(--ease),
+        border-color .3s;
+}
+
+.glass-card:hover {
+    border-color:
+        rgba(0,234,255,.22);
+}
+
+.glass-card::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        200px;
+
+    height:
+        200px;
+
+    top:
+        -120px;
+
+    right:
+        -80px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--cyan);
+
+    filter:
+        blur(100px);
+
+    opacity:
+        .08;
+}
+
+.glass-card h2 {
+    margin-top:
+        0;
+
+    font-size:
+        1.8rem;
+}
+
+.glass-card p {
+    color:
+        var(--muted);
+
+    line-height:
+        1.8;
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+.timeline {
+    margin-top:
+        35px;
+
+    border-left:
+        1px solid rgba(0,234,255,.25);
+
+    padding-left:
+        25px;
+}
+
+.timeline-item {
+    position:
+        relative;
+
+    margin-bottom:
+        30px;
+}
+
+.timeline-item::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        9px;
+
+    height:
+        9px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--cyan);
+
+    left:
+        -30px;
+
+    top:
+        6px;
+
+    box-shadow:
+        0 0 10px var(--cyan),
+        0 0 25px rgba(0,234,255,.7);
+}
+
+.timeline-item h3 {
+    margin:
+        0 0 5px;
+}
+
+.timeline-item p {
+    margin:
+        0;
+}
+
+
+/* =========================================================
+   TRIVIA
+========================================================= */
+
+.trivia-list {
+    display:
+        grid;
+
+    gap:
+        15px;
+}
+
+.trivia {
+    padding:
+        18px;
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid rgba(255,255,255,.06);
+
+    transition:
+        .3s;
+}
+
+.trivia:hover {
+    transform:
+        translateX(6px);
+
+    border-color:
+        rgba(0,234,255,.3);
+
+    background:
+        rgba(0,234,255,.035);
+}
+
+.trivia strong {
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        white;
+}
+
+.answer {
+    color:
+        var(--cyan);
+
+    font-size:
+        .9rem;
+}
+
+
+/* =========================================================
+   FACTS
+========================================================= */
+
+.fact-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:
+        18px;
+
+    margin-top:
+        25px;
+}
+
+.fact {
+    padding:
+        25px;
+
+    text-align:
+        center;
+
+    border:
+        1px solid rgba(255,255,255,.07);
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(255,255,255,.025);
+}
+
+.fact-number {
+    font-size:
+        2rem;
+
+    font-weight:
+        900;
+
+    color:
+        var(--cyan);
+
+    text-shadow:
+        0 0 15px rgba(0,234,255,.4);
+}
+
+.fact-label {
+    margin-top:
+        5px;
+
+    color:
+        #858da1;
+
+    font-size:
+        .75rem;
+
+    letter-spacing:
+        1px;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   MUSIC PLAYER
+========================================================= */
+
+.music-player {
+    position:
+        fixed;
+
+    right:
+        25px;
+
+    bottom:
+        25px;
+
+    z-index:
+        80;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    padding:
+        8px 15px 8px 8px;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(5,8,13,.72);
+
+    border:
+        1px solid rgba(0,234,255,.2);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.45),
+        0 0 25px rgba(0,234,255,.06);
+
+    transition:
+        .4s var(--ease);
+}
+
+.music-player:hover {
+    border-color:
+        rgba(0,234,255,.55);
+
+    box-shadow:
+        0 10px 50px rgba(0,0,0,.6),
+        0 0 35px rgba(0,234,255,.15);
+
+    transform:
+        translateY(-3px);
+}
+
+#musicButton {
+    width:
+        45px;
+
+    height:
+        45px;
+
+    border-radius:
+        50%;
+
+    border:
+        1px solid rgba(0,234,255,.35);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.16),
+            rgba(0,234,255,.03)
+        );
+
+    color:
+        var(--cyan);
+
+    cursor:
+        pointer;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    position:
+        relative;
+
+    box-shadow:
+        0 0 15px rgba(0,234,255,.12);
+
+    transition:
+        .3s;
+}
+
+#musicButton:hover {
+    box-shadow:
+        0 0 15px rgba(0,234,255,.35),
+        0 0 40px rgba(0,234,255,.12);
+
+    transform:
+        scale(1.06);
+}
+
+.music-icon {
+    font-size:
+        20px;
+
+    line-height:
+        1;
+
+    position:
+        relative;
+
+    z-index:
+        2;
+}
+
+.music-bars {
+    display:
+        none;
+
+    align-items:
+        center;
+
+    gap:
+        2px;
+
+    height:
+        20px;
+}
+
+.music-bars i {
+    display:
+        block;
+
+    width:
+        3px;
+
+    height:
+        8px;
+
+    border-radius:
+        5px;
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 8px var(--cyan);
+
+    animation:
+        musicBar .7s ease-in-out infinite alternate;
+}
+
+.music-bars i:nth-child(1) {
+    animation-delay:
+        -.3s;
+}
+
+.music-bars i:nth-child(2) {
+    animation-delay:
+        -.1s;
+}
+
+.music-bars i:nth-child(3) {
+    animation-delay:
+        -.5s;
+}
+
+.music-bars i:nth-child(4) {
+    animation-delay:
+        -.2s;
+}
+
+.music-player.playing .music-icon {
+    display:
+        none;
+}
+
+.music-player.playing .music-bars {
+    display:
+        flex;
+}
+
+.music-info {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    min-width:
+        110px;
+}
+
+.music-status {
+    color:
+        var(--cyan);
+
+    font-size:
+        .55rem;
+
+    letter-spacing:
+        2px;
+
+    margin-bottom:
+        3px;
+}
+
+.music-info strong {
+    color:
+        white;
+
+    font-size:
+        .72rem;
+
+    font-weight:
+        500;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+    position:
+        relative;
+
+    z-index:
+        2;
+
+    padding:
+        50px 20px 70px;
+
+    text-align:
+        center;
+
+    color:
+        #596173;
+
+    font-size:
+        .8rem;
+}
+
+footer span {
+    color:
+        var(--cyan);
+}
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+#lightbox {
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    padding:
+        30px;
+
+    background:
+        rgba(0,0,0,.88);
+
+    backdrop-filter:
+        blur(18px);
+
+    z-index:
+        100;
+
+    opacity:
+        0;
+
+    visibility:
+        hidden;
+
+    transition:
+        opacity .35s,
+        visibility .35s;
+}
+
+#lightbox.active {
+    opacity:
+        1;
+
+    visibility:
+        visible;
+}
+
+#lightbox img {
+    max-width:
+        92vw;
+
+    max-height:
+        85vh;
+
+    object-fit:
+        contain;
+
+    border-radius:
+        14px;
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+        0 0 80px rgba(0,234,255,.15),
+        0 30px 100px rgba(0,0,0,.8);
+
+    transform:
+        scale(.85);
+
+    transition:
+        transform .5s var(--ease);
+}
+
+#lightbox.active img {
+    transform:
+        scale(1);
+}
+
+.lightbox-close {
+    position:
+        absolute;
+
+    top:
+        25px;
+
+    right:
+        30px;
+
+    width:
+        45px;
+
+    height:
+        45px;
+
+    border-radius:
+        50%;
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    background:
+        rgba(255,255,255,.05);
+
+    color:
+        white;
+
+    font-size:
+        1.5rem;
+
+    cursor:
+        pointer;
+
+    transition:
+        .3s;
+}
+
+.lightbox-close:hover {
+    background:
+        rgba(0,234,255,.12);
+
+    border-color:
+        var(--cyan);
+
+    box-shadow:
+        0 0 25px rgba(0,234,255,.25);
+}
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+.reveal {
+    opacity:
+        0;
+
+    transform:
+        translateY(40px);
+
+    transition:
+        opacity 1s var(--ease),
+        transform 1s var(--ease);
+}
+
+.reveal.visible {
+    opacity:
+        1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes pulse {
+
+    0%, 100% {
+        opacity:
+            .4;
+
+        transform:
+            scale(.8);
+    }
+
+    50% {
+        opacity:
+            1;
+
+        transform:
+            scale(1.3);
+    }
+
+}
+
+@keyframes fadeUp {
+
+    from {
+        opacity:
+            0;
+
+        transform:
+            translateY(30px);
+    }
+
+    to {
+        opacity:
+            1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+@keyframes heroReveal {
+
+    from {
+        opacity:
+            0;
+
+        transform:
+            translateY(50px)
+            scale(.95);
+
+        filter:
+            blur(10px);
+    }
+
+    to {
+        opacity:
+            1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+        filter:
+            blur(0);
+    }
+
+}
+
+@keyframes lineGrow {
+
+    from {
+        transform:
+            scaleX(0);
+    }
+
+    to {
+        transform:
+            scaleX(1);
+    }
+
+}
+
+@keyframes musicBar {
+
+    from {
+        height:
+            5px;
+    }
+
+    to {
+        height:
+            18px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .nav-links {
+        display:
+            none;
+    }
+
+    .nav {
+        justify-content:
+            center;
+    }
+
+    .content-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .fact-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .gallery-item {
+        height:
+            400px;
+    }
+
+    .glass-card {
+        padding:
+            25px;
+    }
+
+    .hero h1 {
+        letter-spacing:
+            -3px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .music-player {
+        right:
+            15px;
+
+        bottom:
+            15px;
+    }
+
+    .music-info {
+        display:
+            none;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior:
+            auto !important;
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            .01ms !important;
+    }
+
+    #vfxCanvas,
+    #cursorGlow {
+        display:
+            none;
+    }
+
+}
+
+</style>
 </head>
+
+
 <body>
 
-    <h1>The Grieve Ancestry</h1>
 
-    <!-- Photo Gallery -->
+<!-- ======================================================
+     VFX
+====================================================== -->
+
+<canvas id="vfxCanvas"></canvas>
+
+<div id="cursorGlow"></div>
+
+
+<!-- ======================================================
+     NAVIGATION
+====================================================== -->
+
+<nav class="nav">
+
+    <div class="logo">
+        GRIEVE<span>//</span>ANCESTRY
+    </div>
+
+    <div class="nav-links">
+
+        <a href="#memories">
+            Memories
+        </a>
+
+        <a href="#history">
+            History
+        </a>
+
+        <a href="#trivia">
+            Trivia
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+
+<header class="hero">
+
+    <div class="eyebrow">
+
+        <span class="status-dot"></span>
+
+        Family Archive // Blyth
+
+    </div>
+
+
+    <h1 data-text="THE GRIEVE ANCESTRY">
+
+        THE GRIEVE<br>
+        ANCESTRY
+
+    </h1>
+
+
+    <p class="hero-subtitle">
+
+        Exploring generations, memories and connections
+        surrounding the Grieve family and their roots in
+        Blyth, Northumberland.
+
+    </p>
+
+
+    <div class="hero-line"></div>
+
+</header>
+
+
+
+<!-- ======================================================
+     MEMORIES
+====================================================== -->
+
+<section
+    id="memories"
+    class="reveal">
+
+    <div class="section-label">
+        01 // Family Memories
+    </div>
+
+    <h2 class="section-title">
+        Moments preserved.
+    </h2>
+
+
     <div class="photo-gallery">
-        <div class="gallery-item" onclick="openLightbox('cake.png')">
-            <img src="cake.png" alt="Birthday Cake">
+
+
+        <div
+            class="gallery-item tilt"
+            onclick="openLightbox('cake.png')">
+
+            <img
+                src="cake.png"
+                alt="Birthday Cake"
+                loading="lazy">
+
         </div>
-        <div class="gallery-item" onclick="openLightbox('gorilla.png')">
-            <img src="gorilla.png" alt="Safari Park Gorilla Statue">
+
+
+        <div
+            class="gallery-item tilt"
+            onclick="openLightbox('gorilla.png')">
+
+            <img
+                src="gorilla.png"
+                alt="Safari Park Gorilla Statue"
+                loading="lazy">
+
         </div>
-        <div class="gallery-item" onclick="openLightbox('swings.png')">
-            <img src="swings.png" alt="Swings at Night">
+
+
+        <div
+            class="gallery-item tilt"
+            onclick="openLightbox('swings.png')">
+
+            <img
+                src="swings.png"
+                alt="Swings at Night"
+                loading="lazy">
+
         </div>
+
+
     </div>
 
-    <!-- Family History Section -->
-    <div class="history-section">
-        <h2>The Grieve Family of Blyth</h2>
-        <p>The Grieve family has connections to Blyth, Northumberland, and forms part of a wider family story rooted in the local community. Liam Grieve is part of this family, with his mother, Emma, and his father, Adam Crozier.</p>
-        <p>The family’s connection to Blyth can be explored through family records, birth and marriage certificates, census returns, electoral registers, parish records, and local archives. These sources may help establish where earlier generations of the Grieve and Crozier families lived, worked, and raised their families.</p>
-        <p>To build a reliable ancestry history, the family tree could be traced backwards from Liam through Emma and Adam, recording each generation's names, dates, occupations, marriages, and places of residence. Particular attention could be given to Blyth and surrounding Northumberland communities, where historical records may reveal connections between different branches of the family.</p>
-        <p><em>This account should be treated as a starting point rather than a verified genealogy. Specific ancestry claims should be supported by documentary records before being presented as established family history.</em></p>
+</section>
+
+
+
+<!-- ======================================================
+     HISTORY
+====================================================== -->
+
+<section
+    id="history"
+    class="reveal">
+
+
+    <div class="section-label">
+        02 // Family History
     </div>
 
-    <!-- Trivia Section -->
-    <div class="trivia-section">
-        <h2>Test Your Knowledge: Grieve Family Trivia</h2>
-        <p><strong>1. Which Northumberland town is central to the Grieve family history?</strong><br>
-        <em>Answer: Blyth</em></p>
-        
-        <p><strong>2. Who are Liam Grieve's parents mentioned in the family story?</strong><br>
-        <em>Answer: Emma and Adam Crozier</em></p>
-        
-        <p><strong>3. Name types of documents suggested for building a reliable ancestry history.</strong><br>
-        <em>Answer: Birth/marriage certificates, census returns, electoral registers, parish records, and local archives.</em></p>
+
+    <h2 class="section-title">
+        The Grieve Family of Blyth
+    </h2>
+
+
+    <div class="content-grid">
+
+
+        <article class="glass-card">
+
+            <h2>
+                Tracing the story
+            </h2>
+
+
+            <p>
+                The Grieve family has connections to Blyth,
+                Northumberland, and forms part of a wider
+                family story rooted in the local community.
+                Liam Grieve is part of this family, with his
+                mother, Emma, and his father, Adam Crozier.
+            </p>
+
+
+            <p>
+                The family's connection to Blyth can be
+                explored through family records, birth and
+                marriage certificates, census returns,
+                electoral registers, parish records and
+                local archives.
+            </p>
+
+
+            <p>
+                These sources may help establish where
+                earlier generations of the Grieve and
+                Crozier families lived, worked and raised
+                their families.
+            </p>
+
+
+            <div class="timeline">
+
+
+                <div class="timeline-item">
+
+                    <h3>
+                        Liam Grieve
+                    </h3>
+
+                    <p>
+                        A starting point for exploring
+                        the family tree.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <h3>
+                        Emma
+                    </h3>
+
+                    <p>
+                        Liam's mother, forming one branch
+                        of the family story.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <h3>
+                        Adam Crozier
+                    </h3>
+
+                    <p>
+                        Liam's father and the Crozier
+                        connection.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <h3>
+                        Blyth, Northumberland
+                    </h3>
+
+                    <p>
+                        A key geographical connection
+                        to investigate through historical
+                        records.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </article>
+
+
+
+        <aside class="glass-card">
+
+            <h2>
+                Archive Data
+            </h2>
+
+
+            <div class="fact-grid">
+
+
+                <div class="fact">
+
+                    <div class="fact-number">
+                        01
+                    </div>
+
+                    <div class="fact-label">
+                        Location
+                    </div>
+
+                </div>
+
+
+                <div class="fact">
+
+                    <div class="fact-number">
+                        02
+                    </div>
+
+                    <div class="fact-label">
+                        Family Lines
+                    </div>
+
+                </div>
+
+
+                <div class="fact">
+
+                    <div class="fact-number">
+                        ∞
+                    </div>
+
+                    <div class="fact-label">
+                        Generations
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <p>
+
+                The archive is intended as a starting point.
+                Documentary evidence should be used to verify
+                individual relationships and historical claims.
+
+            </p>
+
+        </aside>
+
+
     </div>
 
-    <!-- Fullscreen Lightbox Container -->
-    <div id="lightbox" onclick="closeLightbox()">
-        <img id="lightbox-img" src="" alt="Fullscreen View">
+</section>
+
+
+
+<!-- ======================================================
+     TRIVIA
+====================================================== -->
+
+<section
+    id="trivia"
+    class="reveal">
+
+
+    <div class="section-label">
+        03 // Knowledge Test
     </div>
 
-    <script>
-        function openLightbox(imageSrc) {
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImg = document.getElementById('lightbox-img');
-            lightboxImg.src = imageSrc;
-            lightbox.style.display = 'flex';
+
+    <h2 class="section-title">
+        Test your knowledge.
+    </h2>
+
+
+    <div class="glass-card">
+
+
+        <div class="trivia-list">
+
+
+            <div class="trivia">
+
+                <strong>
+
+                    01 — Which Northumberland town is central
+                    to the Grieve family history?
+
+                </strong>
+
+                <span class="answer">
+                    Answer: Blyth
+                </span>
+
+            </div>
+
+
+            <div class="trivia">
+
+                <strong>
+
+                    02 — Who are Liam Grieve's parents
+                    mentioned in the family story?
+
+                </strong>
+
+                <span class="answer">
+
+                    Answer: Emma and Adam Crozier
+
+                </span>
+
+            </div>
+
+
+            <div class="trivia">
+
+                <strong>
+
+                    03 — What documents can help establish
+                    a reliable ancestry history?
+
+                </strong>
+
+                <span class="answer">
+
+                    Birth and marriage certificates,
+                    census returns, electoral registers,
+                    parish records and local archives.
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     ARCHIVE NOTE
+====================================================== -->
+
+<section class="reveal">
+
+    <div class="glass-card">
+
+        <div class="section-label">
+            Archive Note
+        </div>
+
+        <p>
+
+            This account should be treated as a starting
+            point rather than a verified genealogy.
+            Specific ancestry claims should be supported
+            by documentary records before being presented
+            as established family history.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    THE GRIEVE ANCESTRY
+
+    <span>◆</span>
+
+    FAMILY ARCHIVE
+
+</footer>
+
+
+
+<!-- ======================================================
+     MUSIC PLAYER
+====================================================== -->
+
+<div
+    class="music-player"
+    id="musicPlayer">
+
+
+    <button
+        id="musicButton"
+        aria-label="Play background music"
+        title="Play music">
+
+
+        <span class="music-icon">
+            ♫
+        </span>
+
+
+        <span class="music-bars">
+
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+
+        </span>
+
+
+    </button>
+
+
+    <div class="music-info">
+
+        <span class="music-status">
+            NOW PLAYING
+        </span>
+
+        <strong>
+            Second Avenue
+        </strong>
+
+    </div>
+
+
+</div>
+
+
+<!-- ======================================================
+     AUDIO
+====================================================== -->
+
+<audio
+    id="backgroundMusic"
+    loop
+    preload="auto">
+
+    <source
+        src="Second Avenue.mp3"
+        type="audio/mpeg">
+
+</audio>
+
+
+
+<!-- ======================================================
+     LIGHTBOX
+====================================================== -->
+
+<div
+    id="lightbox"
+    onclick="closeLightbox(event)">
+
+
+    <button
+        class="lightbox-close"
+        onclick="closeLightbox(event)"
+        aria-label="Close image">
+
+        ×
+
+    </button>
+
+
+    <img
+        id="lightbox-img"
+        src=""
+        alt="Fullscreen family memory">
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   PARTICLE / VFX ENGINE
+========================================================= */
+
+const canvas =
+    document.getElementById("vfxCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let particles = [];
+
+let width;
+let height;
+
+
+const mouse = {
+
+    x:
+        window.innerWidth / 2,
+
+    y:
+        window.innerHeight / 2
+
+};
+
+
+function resizeCanvas() {
+
+    width =
+        canvas.width =
+        window.innerWidth;
+
+    height =
+        canvas.height =
+        window.innerHeight;
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+resizeCanvas();
+
+
+
+class Particle {
+
+    constructor() {
+
+        this.reset();
+
+        this.y =
+            Math.random() * height;
+
+    }
+
+
+    reset() {
+
+        this.x =
+            Math.random() * width;
+
+        this.y =
+            height +
+            Math.random() * 100;
+
+        this.size =
+            Math.random() * 1.8 +
+            .3;
+
+        this.speed =
+            Math.random() * .5 +
+            .15;
+
+        this.alpha =
+            Math.random() * .7 +
+            .1;
+
+        this.angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+    }
+
+
+    update() {
+
+        this.y -=
+            this.speed;
+
+        this.angle +=
+            .002;
+
+        this.x +=
+            Math.sin(this.angle) *
+            .15;
+
+
+        const dx =
+            mouse.x -
+            this.x;
+
+        const dy =
+            mouse.y -
+            this.y;
+
+        const distance =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+
+        if (
+            distance < 150 &&
+            distance > 0
+        ) {
+
+            this.x -=
+                dx / distance *
+                .5;
+
+            this.y -=
+                dy / distance *
+                .5;
+
         }
 
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            lightbox.style.display = 'none';
+
+        if (
+            this.y < -20
+        ) {
+
+            this.reset();
+
         }
-    </script>
+
+    }
+
+
+    draw() {
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+            `rgba(
+                0,
+                234,
+                255,
+                ${this.alpha}
+            )`;
+
+
+        ctx.fill();
+
+    }
+
+}
+
+
+
+for (
+    let i = 0;
+    i < 130;
+    i++
+) {
+
+    particles.push(
+        new Particle()
+    );
+
+}
+
+
+
+function connectParticles() {
+
+    for (
+        let i = 0;
+        i < particles.length;
+        i++
+    ) {
+
+        for (
+            let j = i + 1;
+            j < particles.length;
+            j++
+        ) {
+
+
+            const dx =
+                particles[i].x -
+                particles[j].x;
+
+            const dy =
+                particles[i].y -
+                particles[j].y;
+
+
+            const distance =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+
+            if (
+                distance < 110
+            ) {
+
+                const opacity =
+                    .12 *
+                    (
+                        1 -
+                        distance / 110
+                    );
+
+
+                ctx.beginPath();
+
+
+                ctx.moveTo(
+                    particles[i].x,
+                    particles[i].y
+                );
+
+
+                ctx.lineTo(
+                    particles[j].x,
+                    particles[j].y
+                );
+
+
+                ctx.strokeStyle =
+                    `rgba(
+                        85,
+                        119,
+                        255,
+                        ${opacity}
+                    )`;
+
+
+                ctx.lineWidth =
+                    .5;
+
+
+                ctx.stroke();
+
+            }
+
+        }
+
+    }
+
+}
+
+
+
+function animate() {
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    particles.forEach(
+        particle => {
+
+            particle.update();
+
+            particle.draw();
+
+        }
+    );
+
+
+    connectParticles();
+
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+
+animate();
+
+
+
+/* =========================================================
+   CURSOR GLOW
+========================================================= */
+
+const cursorGlow =
+    document.getElementById(
+        "cursorGlow"
+    );
+
+
+window.addEventListener(
+    "mousemove",
+    event => {
+
+        mouse.x =
+            event.clientX;
+
+        mouse.y =
+            event.clientY;
+
+
+        cursorGlow.style.left =
+            event.clientX +
+            "px";
+
+
+        cursorGlow.style.top =
+            event.clientY +
+            "px";
+
+    }
+);
+
+
+
+/* =========================================================
+   3D CARD TILT
+========================================================= */
+
+document
+    .querySelectorAll(".tilt")
+    .forEach(card => {
+
+
+        card.addEventListener(
+            "mousemove",
+            event => {
+
+
+                const rect =
+                    card.getBoundingClientRect();
+
+
+                const x =
+                    event.clientX -
+                    rect.left;
+
+
+                const y =
+                    event.clientY -
+                    rect.top;
+
+
+                const centerX =
+                    rect.width / 2;
+
+
+                const centerY =
+                    rect.height / 2;
+
+
+                const rotateX =
+                    (
+                        (y - centerY) /
+                        centerY
+                    ) * -5;
+
+
+                const rotateY =
+                    (
+                        (x - centerX) /
+                        centerX
+                    ) * 5;
+
+
+                card.style.transform =
+                    `
+                    perspective(900px)
+                    rotateX(${rotateX}deg)
+                    rotateY(${rotateY}deg)
+                    translateY(-5px)
+                    `;
+
+            }
+        );
+
+
+        card.addEventListener(
+            "mouseleave",
+            () => {
+
+                card.style.transform =
+                    "";
+
+            }
+        );
+
+    });
+
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+const revealObserver =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(
+                entry => {
+
+                    if (
+                        entry.isIntersecting
+                    ) {
+
+                        entry.target
+                            .classList
+                            .add("visible");
+
+
+                        revealObserver
+                            .unobserve(
+                                entry.target
+                            );
+
+                    }
+
+                }
+            );
+
+        },
+        {
+            threshold:
+                .12
+        }
+    );
+
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(
+        element => {
+
+            revealObserver.observe(
+                element
+            );
+
+        }
+    );
+
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+const lightbox =
+    document.getElementById(
+        "lightbox"
+    );
+
+
+const lightboxImg =
+    document.getElementById(
+        "lightbox-img"
+    );
+
+
+function openLightbox(
+    imageSrc
+) {
+
+    lightboxImg.src =
+        imageSrc;
+
+
+    lightbox.classList.add(
+        "active"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+
+function closeLightbox(
+    event
+) {
+
+    if (
+        event &&
+        event.target ===
+        lightboxImg
+    ) {
+
+        return;
+
+    }
+
+
+    lightbox.classList.remove(
+        "active"
+    );
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            lightbox.classList.contains(
+                "active"
+            )
+        ) {
+
+            closeLightbox();
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   MUSIC PLAYER
+========================================================= */
+
+const music =
+    document.getElementById(
+        "backgroundMusic"
+    );
+
+
+const musicButton =
+    document.getElementById(
+        "musicButton"
+    );
+
+
+const musicPlayer =
+    document.getElementById(
+        "musicPlayer"
+    );
+
+
+let musicPlaying =
+    false;
+
+
+
+function fadeInMusic() {
+
+    music.volume =
+        0;
+
+
+    music.play()
+        .then(() => {
+
+
+            musicPlaying =
+                true;
+
+
+            musicPlayer.classList.add(
+                "playing"
+            );
+
+
+            let volume =
+                0;
+
+
+            const fade =
+                setInterval(
+                    () => {
+
+
+                        volume +=
+                            .025;
+
+
+                        music.volume =
+                            Math.min(
+                                volume,
+                                .45
+                            );
+
+
+                        if (
+                            volume >= .45
+                        ) {
+
+                            clearInterval(
+                                fade
+                            );
+
+                        }
+
+                    },
+                    100
+                );
+
+        })
+        .catch(
+            error => {
+
+                console.log(
+                    "Unable to play audio:",
+                    error
+                );
+
+            }
+        );
+
+}
+
+
+
+musicButton.addEventListener(
+    "click",
+    () => {
+
+
+        if (
+            music.paused
+        ) {
+
+            fadeInMusic();
+
+        } else {
+
+
+            music.pause();
+
+
+            musicPlaying =
+                false;
+
+
+            musicPlayer.classList.remove(
+                "playing"
+            );
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   RANDOM MICRO GLITCH
+========================================================= */
+
+const heroTitle =
+    document.querySelector(
+        ".hero h1"
+    );
+
+
+setInterval(
+    () => {
+
+
+        heroTitle.style.transform =
+            "translateX(1px)";
+
+
+        setTimeout(
+            () => {
+
+                heroTitle.style.transform =
+                    "";
+
+            },
+            70
+        );
+
+
+    },
+    6000
+);
+
+</script>
 
 </body>
 </html>
